@@ -1,4 +1,4 @@
-```md
+
 # OpenIPC 音频端点接口
 
 此存储库提供工具，可直接从 Web 浏览器或 Home Assistant 卡片向 OpenIPC `/play_audio` 端点发送音频。
