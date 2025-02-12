@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Recorder</title>
+    <style>
+        /* 页面背景渐变动画 */
+        @keyframes backgroundAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body {
+            background: linear-gradient(45deg, #ff6b6b, #f5a623, #4db8ff, #ff6b6b);
+            background-size: 400% 400%;
+            animation: backgroundAnimation 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* 按钮样式 */
+        #recordButton {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ff3b3b);
+            color: white;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        }
+
+        /* 按钮悬浮效果 */
+        #recordButton:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 按钮点击效果 */
+        #recordButton:active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 按钮脉冲动画 */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* 按钮在加载时脉冲 */
+        #recordButton {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        /* 按钮录音中（按下）时变成绿色 */
+        #recordButton.recording {
+            background: linear-gradient(45deg, #4CAF50, #388E3C);
+        }
+    </style>
+</head>
+<body>
+    <button id="recordButton">录音</button>
+    <script src="library/recorder.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
