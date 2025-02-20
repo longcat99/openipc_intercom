@@ -3,19 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Recorder</title>
+    <title>智能语音助手</title>
     <style>
         /* 页面背景渐变动画 */
         @keyframes backgroundAnimation {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         body {
@@ -23,68 +17,326 @@
             background-size: 400% 400%;
             animation: backgroundAnimation 15s ease infinite;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
             font-family: 'Arial', sans-serif;
         }
 
-        /* 按钮样式 */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+        }
+
+        /* 文本输入区样式 */
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4db8ff;
+            box-shadow: 0 0 15px rgba(77, 184, 255, 0.3);
+        }
+
+        /* 按钮通用样式 */
+        .btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* 生成按钮样式 */
+        #generateBtn {
+            background: linear-gradient(45deg, #4CAF50, #388E3C);
+            color: white;
+            margin-top: 15px;
+        }
+
+        #generateBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 142, 60, 0.4);
+        }
+
+        /* 录音按钮样式 */
         #recordButton {
             width: 120px;
             height: 120px;
             border-radius: 50%;
             background: linear-gradient(45deg, #ff6b6b, #ff3b3b);
             color: white;
-            border: none;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            outline: none;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            transition: all 0.3s ease;
+            margin: 60px 0;
         }
 
-        /* 按钮悬浮效果 */
-        #recordButton:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        #recordButton.recording {
+            background: linear-gradient(45deg, #4CAF50, #388E3C);
         }
 
-        /* 按钮点击效果 */
-        #recordButton:active {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        #audioPlayer.show {
+            opacity: 1;
         }
 
         /* 按钮脉冲动画 */
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        /* 按钮在加载时脉冲 */
-        #recordButton {
+        .pulse {
             animation: pulse 1.5s infinite ease-in-out;
         }
 
-        /* 按钮录音中（按下）时变成绿色 */
-        #recordButton.recording {
-            background: linear-gradient(45deg, #4CAF50, #388E3C);
+        /* ========== 新版通知样式 ========== */
+        @keyframes slideDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-100%) scale(0.8);
+            }
+            80% {
+                transform: translateY(10%);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
+        @keyframes slideUp {
+            to {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+            50% { box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+            100% { box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 35px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, 
+                rgba(255,255,255,0.15) 0%,
+                rgba(255,255,255,0.05) 100%);
+            animation: slideDown 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+                       glow 2s infinite;
+            overflow: hidden;
+        }
+
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 25%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 75%
+            );
+            animation: shine 3s infinite;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, 
+                rgba(76,175,80,0.9) 0%,
+                rgba(56,142,60,0.9) 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, 
+                rgba(244,67,54,0.9) 0%,
+                rgba(211,47,47,0.9) 100%);
+        }
+
+        .notification.processing {
+            background: linear-gradient(135deg, 
+                rgba(33,150,243,0.9) 0%,
+                rgba(21,101,192,0.9) 100%);
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .notification.success .notification-icon {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+        }
+
+        .notification.error .notification-icon {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>');
+        }
+
+        .notification.processing .notification-icon {
+            animation: spin 1s linear infinite;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/></svg>');
+        }
+
+        @keyframes shine {
+            to {
+                left: 100%;
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 进度条动画 */
+        .notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .notification-progress::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            background: white;
+            animation: progress 3s linear forwards;
+        }
+
+        @keyframes progress {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        
     </style>
 </head>
 <body>
-    <button id="recordButton">录音</button>
-    <script src="library/recorder.js"></script>
-    <script src="script.js"></script>
+    <div class="container">
+        <div class="input-group">
+            <h2 style="color: white; margin-bottom: 15px;">文本转语音</h2>
+            <textarea id="textInput" placeholder="输入要转换的文本..."></textarea>
+            <button id="generateBtn" class="btn pulse">
+                <span>生成语音</span>
+                
+                    <script>
+                // 更新后的通知函数
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            notification.innerHTML = `
+                <div class="notification-icon"></div>
+                <span>${message}</span>
+                <div class="notification-progress"></div>
+            `;
+
+            document.body.appendChild(notification);
+            
+            // 自动移除逻辑
+            setTimeout(() => {
+                notification.style.animation = 'slideUp 0.3s forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 2700);
+        }
+        
+
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('generateBtn');
+            const text = document.getElementById('textInput').value;
+            
+            if (!text.trim()) {
+                showNotification('请输入有效文本', 'error');
+                return;
+            }
+
+            try {
+                // 显示加载状态
+                btn.classList.add('loading');
+                btn.innerHTML = '<span>生成中...</span><div class="loader"></div>';
+
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`请求失败: ${response.status}`);
+                }
+
+                showNotification('语音生成成功');
+            } catch (error) {
+                console.error('错误:', error);
+                showNotification(`生成失败: ${error.message}`, 'error');
+            } finally {
+                // 重置按钮状态
+                btn.classList.remove('loading');
+                btn.innerHTML = '<span>生成语音</span>';
+            }
+        });
+    </script>
+        </div>
+
+        <div style="text-align: center;">
+            <h2 style="color: white; margin-bottom: 15px;">语音录制</h2>
+            <button id="recordButton" class="pulse">录音</button>
+            <script src="library/recorder.js"></script>
+            <script src="script.js"></script>
+        </div>
+    </div>
+
 </body>
 </html>

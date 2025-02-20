@@ -1,10 +1,25 @@
 {
+  "mqtt": {
+    "broker": "tcp://emqx.test.com:1883",
+    "client_id": "go_mqtt_client",
+    "username": "admin",
+    "password": "admin",
+    "topic": "longcat/test"
+  },
+  "tts": {
+    "voice": "zh-CN-XiaoxiaoNeural",
+    "rate": "25",
+    "request_url": "http://192.168.100.18:1233/api/ra_wav"
+  },
+  "web": {
     "port": "3333",
-    "webPath": "./www/",
-    "uploadPath": "./uploads/",
-    "playAudioURL": "http://127.0.0.1/play_audio",
-    "volScalingFactor": "0.10",
+    "web_path": "./www",
+    "upload_path": "/tmp/",
+    "vol_scaling_factor": "1.5"
+  },
+  "audio_api": {
+    "play_url": "http://127.0.0.1/play_audio",
     "username": "root",
-    "password": "123456"
-
+    "password": "12345"
+  }
 }
