@@ -61,11 +61,19 @@ mv config.json.example config.json
 ```sh
 http://<ip-address>:3333/index.html
 ```
+文本转语音api使用edge-tts的python程序
+https://github.com/wangz-code/legado-edge-tts
+
+运行项目中tts.py即可
+```
+python3 tts.py
+```
+具体可参考https://github.com/wangz-code/legado-edge-tts
+由于edge-tts请求的音频为mp3格式，所以进行一定修改，在py程序中进行了格式转换，转换为wav采样率为8000的音频，openipc也请设置为采样率8000（测试openipc仅只支持8000和48000）
 
 ## 致谢
 
 本项目受 [simple-recorderjs-demo](https://github.com/addpipe/simple-recorderjs-demo/tree/master) 启发，并基于其代码进行开发。
-
-
+本项目受 [legado-edge-tts](https://github.com/wangz-code/legado-edge-tts) 启发，并基于其代码进行开发。
 本项目受 [openipc_intercom](https://github.com/gtxaspec/openipc_intercom) 启发，并基于其代码进行开发。
 
